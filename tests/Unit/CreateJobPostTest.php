@@ -37,7 +37,7 @@ class CreateJobPostTest extends TestCase
     }
 
     /**
-     * A basic unit test for checking if notification is fired when the job poster is new.
+     * A basic unit test for checking if notification is not fired when the job poster is existing.
      */
     public function test_no_notification_for_job_posting_with_existing_email(): void
     {
