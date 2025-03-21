@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('recruiting_category', 150)->nullable();
             $table->string('seniority', 50)->nullable();
             $table->string('schedule', 50)->nullable();
-            $table->string('yearsOfExperience', 10)->nullable();
+            $table->string('years_of_experience', 10)->nullable();
             $table->string('keywords')->nullable();
             $table->string('occupation', 150)->nullable();
-            $table->string('occupationCategory', 150)->nullable();
+            $table->string('occupation_category', 150)->nullable();
             $table->json('job_descriptions')->nullable();
             $table->json('additional_offices')->nullable();
             $table->timestamp('created_at');
@@ -41,6 +41,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('job_posts', function (Blueprint $table) {
+            $table->dropForeign('job_posts_external_id_foreign');
+        });
         Schema::dropIfExists('job_post_external_details');
     }
 };
