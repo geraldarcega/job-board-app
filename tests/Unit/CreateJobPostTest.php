@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Actions\CreateJobPost;
 use App\Models\JobPost;
 use App\Models\User;
+use App\Notifications\FirstTimePostingJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
@@ -18,40 +19,46 @@ class CreateJobPostTest extends TestCase
     /**
      * A basic unit test for checking if notification is fired when the job poster is new.
      */
-    public function test_notification_for_new_email(): void
+    public function test_notification_for_posting_using_new_email(): void
     {
         Notification::fake();
 
-        User::factory(1)->create();
+        $user = User::factory()->create();
         $action = new CreateJobPost();
         $newJob = [
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'email' => $this->faker->email,
         ];
-
-        Notification::assertSentTo(User::first(), JobPost::class);
-
         $action->handle($newJob);
+
+        Notification::assertCount(expectedCount: 1);
+        Notification::assertSentTo($user, FirstTimePostingJob::class);
     }
 
     /**
      * A basic unit test for checking if notification is fired when the job poster is new.
      */
-    // public function test_job_posting_with_existing_email(): void
-    // {
-    //     Notification::fake();
+    public function test_no_notification_for_job_posting_with_existing_email(): void
+    {
+        Notification::fake();
 
-    //     $user = User::factory(1)->make();
-    //     $action = new CreateJobPost();
-    //     $newJob = [
-    //         'title' => $this->faker->sentence,
-    //         'description' => $this->faker->paragraph,
-    //         'email' => $this->faker->email,
-    //     ];
+        $testEmail = 'already@exists.com';
+        User::factory(1)->make();
+        JobPost::factory()->create([
+            'posted_by' => $testEmail
+        ]);
+        // User::factory(1)->make();
+        $action = new CreateJobPost();
+        $newJob = [
+            'title' => $this->faker->sentence,
+            'description' => $this->faker->paragraph,
+            'email' => $testEmail,
+        ];
 
-    //     Notification::assertSentTo(User::first(), JobPost::class);
+        $action->handle($newJob);
 
-    //     $action->handle($newJob);
-    // }
+        Notification::assertNothingSent();
+        Notification::assertCount(0);
+    }
 }

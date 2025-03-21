@@ -2,19 +2,21 @@
 
 namespace App\Notifications;
 
+use App\Models\JobPost;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
-class FirstTimePostingJob extends Notification
+class FirstTimePostingJob extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(public JobPost $jobPost)
     {
         //
     }
@@ -35,9 +37,18 @@ class FirstTimePostingJob extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->subject(subject: 'New job post by a new email')
+            ->view('email.first-time', [
+                'post' => $this->jobPost,
+                'approveLink' => URL::signedRoute(
+                    'approve-job-post',
+                    ['job' => $this->jobPost->id]
+                ),
+                'spamLink' => URL::signedRoute(
+                    'mark-job-post-as-spam',
+                    ['job' => $this->jobPost->id]
+                ),
+            ]);
     }
 
     /**

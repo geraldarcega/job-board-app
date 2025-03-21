@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\JobPost;
 use App\Models\User;
+use App\Notifications\FirstTimePostingJob;
 use Illuminate\Support\Facades\Notification;
 
 final class CreateJobPost
@@ -16,13 +17,17 @@ final class CreateJobPost
      */
     public function handle(array $attributes): void
     {
-        $isPosterEmailNew = JobPost::where("email", $attributes["email"])->count() === 0;
-        $jobPost = JobPost::create($attributes);
+        $isPosterEmailNew = JobPost::where("posted_by", $attributes["email"])->count() === 0;
+        $jobPost = JobPost::create([
+            'title' => $attributes['title'],
+            'description' => $attributes['description'],
+            'posted_by' => $attributes['email'],
+        ]);
 
         if ($isPosterEmailNew) {
             // assuming the first user is the moderator
             $moderator = User::first();
-            Notification::send($moderator, $jobPost);
+            Notification::send($moderator, new FirstTimePostingJob($jobPost));
         }
     }
 }

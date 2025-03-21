@@ -10,6 +10,13 @@ class JobPost extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'slug',
+        'title',
+        'description',
+        'posted_by',
+    ];
+
     /**
      * The "booted" method of the model.
      */
