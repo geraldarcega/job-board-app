@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
 
+            $table->index('slug');
             $table->index('title');
             $table->index('posted_by');
         });
