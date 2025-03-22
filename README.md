@@ -3,6 +3,8 @@
 ## Overview
 This is a job board project created using Laravel 12, Inertia, Vue 3, and Sail as the development server. It allows users to post and search for job listings.
 
+External jobs are automatically synced in the database every 2 minutes via scheduled task.
+
 ## Tech Stack
 - **Laravel 12**: A PHP framework for building web applications.
 - **Inertia**: A framework that allows you to create modern single-page React, Vue, and Svelte applications using classic server-side routing and controllers.
@@ -37,7 +39,12 @@ This is a job board project created using Laravel 12, Inertia, Vue 3, and Sail a
     php artisan migrate
     ```
 
-6. Build the front-end assets:
+6. Run the database migrations:
+    ```sh
+    php artisan db:seed
+    ```
+
+7. Build the front-end assets:
     ```sh
     npm run dev
     ```
