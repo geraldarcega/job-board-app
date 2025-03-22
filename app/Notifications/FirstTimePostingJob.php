@@ -40,11 +40,11 @@ class FirstTimePostingJob extends Notification implements ShouldQueue
             ->subject(subject: 'New job post by a new email')
             ->view('email.first-time', [
                 'post' => $this->jobPost,
-                'approveLink' => URL::signedRoute(
+                'approveLink' => route(
                     'approve-job-post',
                     ['job' => $this->jobPost->id]
                 ),
-                'spamLink' => URL::signedRoute(
+                'spamLink' => route(
                     'mark-job-post-as-spam',
                     ['job' => $this->jobPost->id]
                 ),

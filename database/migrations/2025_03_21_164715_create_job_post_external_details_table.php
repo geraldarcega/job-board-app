@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('job_post_external_details', function (Blueprint $table) {
-            $table->bigInteger('id')->unsigned()->primary();
+            $table->id();
+            $table->bigInteger('job_post_id')->unsigned();
             $table->string('subcompany', 150)->nullable();
             $table->string('office', 150)->nullable();
             $table->string('department', 150)->nullable();
@@ -26,13 +27,18 @@ return new class extends Migration
             $table->json('job_descriptions')->nullable();
             $table->json('additional_offices')->nullable();
             $table->timestamp('created_at');
+
+            $table->foreign('job_post_id')
+                ->references('id')
+                ->on('job_posts');
         });
 
         Schema::table('job_posts', function (Blueprint $table) {
-            $table->bigInteger('external_id')->unsigned()->nullable();
-            $table->foreign('external_id')
-                ->references('id')
-                ->on('job_post_external_details');
+            $table->bigInteger('external_id')
+                ->after('id')
+                ->unsigned()
+                ->nullable();
+            $table->index('external_id');
         });
     }
 
@@ -41,9 +47,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('job_posts', function (Blueprint $table) {
-            $table->dropForeign('job_posts_external_id_foreign');
-        });
         Schema::dropIfExists('job_post_external_details');
     }
 };
